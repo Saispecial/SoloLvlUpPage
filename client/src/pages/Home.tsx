@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
-import { Sword, Shield, Zap, TrendingUp, ChevronDown, Send, ExternalLink, Menu, X } from "lucide-react";
+import { Sword, Award, Brain, TrendingUp, ChevronDown, Send, ExternalLink, Menu, X } from "lucide-react";
 import { api, type ContactInput } from "@shared/routes";
 import { useCreateContact } from "@/hooks/use-contact";
 import { NeonButton } from "@/components/NeonButton";
@@ -25,14 +25,11 @@ function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 bg-black/80 backdrop-blur-md border-b border-white/10 h-16 md:h-20">
       <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-sm rotate-45 flex items-center justify-center">
-            <span className="text-black font-bold -rotate-45">S</span>
-          </div>
-          <span className="text-xl md:text-2xl font-display font-bold tracking-wider text-white">
-            SOLO<span className="text-primary">LVL</span>
-          </span>
-        </div>
+        <img 
+          src="/logo.png" 
+          alt="SoloLvlUp" 
+          className="h-8 md:h-10 w-auto"
+        />
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
@@ -46,7 +43,7 @@ function Navbar() {
             </button>
           ))}
           <NeonButton onClick={() => window.open('https://forms.google.com', '_blank')} className="px-6 py-2 text-sm">
-            Join Guild
+            Join Community
           </NeonButton>
         </div>
 
@@ -111,13 +108,13 @@ function HeroSection() {
           </h1>
           
           <p className="max-w-2xl mx-auto text-gray-400 text-lg md:text-xl font-mono mb-10 leading-relaxed">
-            Track your daily quests, rank up your stats, and become the S-Rank hunter you were meant to be.
-            The System is waiting.
+            Track your daily quests, unlock meaningful achievements, and grow through reflection-driven challenges.
+            Your personal growth journey starts here.
           </p>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-6">
             <NeonButton onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}>
-              Accept Quest
+              Start Journey
             </NeonButton>
             <button className="text-white/70 hover:text-white font-mono uppercase tracking-widest text-sm flex items-center gap-2 group transition-colors">
               View Demo
@@ -149,7 +146,7 @@ function DashboardSection() {
     <section id="dashboard" className="py-32 relative overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="mb-20 text-center">
-          <h2 className="text-4xl md:text-5xl mb-4 text-white">Player <span className="text-primary">Interface</span></h2>
+          <h2 className="text-4xl md:text-5xl mb-4 text-white">Growth <span className="text-primary">Dashboard</span></h2>
           <div className="h-1 w-24 bg-gradient-to-r from-transparent via-primary to-transparent mx-auto" />
         </div>
 
@@ -166,7 +163,7 @@ function DashboardSection() {
                <div className="w-3 h-3 rounded-full bg-red-500/50" />
                <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
                <div className="w-3 h-3 rounded-full bg-green-500/50" />
-               <div className="ml-auto text-xs font-mono text-gray-500">SYSTEM.EXE</div>
+               <div className="ml-auto text-xs font-mono text-gray-500">GROWTH.APP</div>
              </div>
              
              {/* Fake UI Content - using abstract shapes instead of screenshot */}
@@ -180,7 +177,7 @@ function DashboardSection() {
                    <div className="h-4 bg-primary/10 rounded w-1/2" />
                  </div>
                  <div className="mt-auto p-4 bg-black/40 rounded border border-white/5">
-                   <div className="text-xs text-primary font-mono mb-2">STATUS: HEALTHY</div>
+                   <div className="text-xs text-primary font-mono mb-2">STATUS: GROWING</div>
                    <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
                      <div className="h-full w-[80%] bg-primary" />
                    </div>
@@ -190,15 +187,15 @@ function DashboardSection() {
                {/* Main Area */}
                <div className="col-span-1 md:col-span-2 grid grid-rows-2 gap-6">
                  <div className="border border-white/10 bg-white/5 rounded p-6 relative overflow-hidden">
-                   <h3 className="text-xl font-display text-white mb-4">Daily Quest: Strength Training</h3>
+                   <h3 className="text-xl font-display text-white mb-4">Daily Focus: Mindful Movement</h3>
                    <div className="grid grid-cols-2 gap-4">
                      <div className="bg-black/40 p-4 rounded">
-                       <div className="text-2xl text-white font-bold">100</div>
-                       <div className="text-xs text-gray-400">PUSH-UPS</div>
+                       <div className="text-2xl text-white font-bold">30min</div>
+                       <div className="text-xs text-gray-400">MEDITATION</div>
                      </div>
                      <div className="bg-black/40 p-4 rounded">
-                       <div className="text-2xl text-white font-bold">10km</div>
-                       <div className="text-xs text-gray-400">RUNNING</div>
+                       <div className="text-2xl text-white font-bold">5km</div>
+                       <div className="text-xs text-gray-400">WALK</div>
                      </div>
                    </div>
                  </div>
@@ -244,10 +241,10 @@ function FeatureCard({ icon: Icon, title, desc, delay }: { icon: any, title: str
 
 function FeaturesSection() {
   const features = [
-    { icon: Sword, title: "Daily Quests", desc: "Complete randomized daily challenges to earn points and avoid the penalty zone." },
-    { icon: TrendingUp, title: "Stat Tracking", desc: "Visualize your growth. Allocate points to Strength, Agility, Sense, Vitality, and Intelligence." },
-    { icon: Shield, title: "Dungeon Keys", desc: "Unlock special workout routines categorized by difficulty ranks E to S." },
-    { icon: Zap, title: "Job Change", desc: "Evolve your workout style. Unlock advanced classes like Shadow Monarch or Assassin." },
+    { icon: Sword, title: "Daily Quests", desc: "Complete personalized daily challenges that adapt to your current life situation and emotional state." },
+    { icon: TrendingUp, title: "Stat Tracking", desc: "Visualize your growth across multiple dimensions: Physical, Mental, Emotional, Social, and Spiritual wellness." },
+    { icon: Award, title: "Achievements & Milestones", desc: "Unlock meaningful milestones that reflect consistency, emotional growth, and real-world progress." },
+    { icon: Brain, title: "Reflection Quests", desc: "AI-guided challenges that turn your real-life struggles into opportunities for growth and self-discovery." },
   ];
 
   return (
@@ -279,16 +276,16 @@ function ContactSection() {
       setAlert({
         open: true,
         type: "success",
-        title: "Message Transmitted",
-        message: "Your inquiry has been sent to the Hunter's Guild."
+        title: "Message Sent",
+        message: "Your message has been received by our community team."
       });
       reset();
     } catch (error) {
       setAlert({
         open: true,
         type: "error",
-        title: "Transmission Failed",
-        message: error instanceof Error ? error.message : "Unknown system error occurred."
+        title: "Send Failed",
+        message: error instanceof Error ? error.message : "Unknown error occurred."
       });
     }
     
@@ -308,16 +305,16 @@ function ContactSection() {
         <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 bg-card/30 border border-white/5 p-8 md:p-12 rounded-2xl backdrop-blur-sm">
           
           <div>
-            <h2 className="text-4xl text-white mb-2">JOIN THE <span className="text-secondary">GUILD</span></h2>
-            <p className="text-gray-400 font-mono mb-8">Send a message to the system administrators.</p>
+            <h2 className="text-4xl text-white mb-2">JOIN THE <span className="text-secondary">COMMUNITY</span></h2>
+            <p className="text-gray-400 font-mono mb-8">Connect with our growth-focused community.</p>
             
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-xs font-mono uppercase text-gray-500">Hunter Name</label>
+                <label className="text-xs font-mono uppercase text-gray-500">Your Name</label>
                 <input 
                   {...register("name")}
                   className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono"
-                  placeholder="Sung Jin-Woo"
+                  placeholder="Alex Johnson"
                 />
                 {errors.name && <span className="text-destructive text-xs">{errors.name.message}</span>}
               </div>
@@ -327,39 +324,39 @@ function ContactSection() {
                 <input 
                   {...register("email")}
                   className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono"
-                  placeholder="hunter@guild.com"
+                  placeholder="alex@email.com"
                 />
                 {errors.email && <span className="text-destructive text-xs">{errors.email.message}</span>}
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-mono uppercase text-gray-500">Inquiry Message</label>
+                <label className="text-xs font-mono uppercase text-gray-500">Your Message</label>
                 <textarea 
                   {...register("message")}
                   rows={4}
                   className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono resize-none"
-                  placeholder="Requesting dungeon access..."
+                  placeholder="I'm interested in starting my growth journey..."
                 />
                 {errors.message && <span className="text-destructive text-xs">{errors.message.message}</span>}
               </div>
 
               <NeonButton type="submit" isLoading={isSubmitting} className="w-full">
-                Transmit Message <Send size={16} />
+                Send Message <Send size={16} />
               </NeonButton>
             </form>
           </div>
 
           <div className="flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-white/10 pt-8 lg:pt-0 lg:pl-12">
             <div>
-              <h3 className="text-2xl text-white mb-6">ALTERNATE CHANNEL</h3>
+              <h3 className="text-2xl text-white mb-6">DIRECT ACCESS</h3>
               <p className="text-gray-400 mb-6 font-mono text-sm leading-relaxed">
-                Prefer a direct application? Access the external Google Form to submit your hunter application directly to the Association database.
+                Prefer a quick start? Use our external form to begin your personal growth journey immediately.
               </p>
             </div>
             
             <div className="bg-gradient-to-br from-secondary/20 to-transparent p-6 rounded-xl border border-secondary/30 box-glow-purple">
-              <h4 className="text-secondary font-bold text-lg mb-2">HUNTER ASSOCIATION FORM</h4>
-              <p className="text-xs text-gray-300 mb-6 font-mono">Form ID: #HA-2024-X</p>
+              <h4 className="text-secondary font-bold text-lg mb-2">GROWTH COMMUNITY FORM</h4>
+              <p className="text-xs text-gray-300 mb-6 font-mono">Form ID: #GC-2024-X</p>
               
               <a 
                 href="https://forms.google.com" 
@@ -367,7 +364,7 @@ function ContactSection() {
                 rel="noreferrer"
                 className="flex items-center justify-center gap-2 w-full py-3 bg-secondary text-white font-bold uppercase tracking-widest hover:bg-secondary/80 transition-colors rounded shadow-[0_0_15px_rgba(157,0,255,0.4)]"
               >
-                Open External Form <ExternalLink size={16} />
+                Open Application Form <ExternalLink size={16} />
               </a>
             </div>
           </div>
@@ -381,10 +378,14 @@ function Footer() {
   return (
     <footer className="py-12 border-t border-white/5 bg-black">
       <div className="container mx-auto px-4 text-center">
-        <div className="text-primary font-display font-bold text-2xl mb-4">SOLOLVL</div>
+        <img 
+          src="/logo.png" 
+          alt="SoloLvlUp" 
+          className="h-12 w-auto mx-auto mb-4"
+        />
         <p className="text-gray-600 font-mono text-sm">
-          © 2024 Hunter Association. All rights reserved. <br/>
-          System Interface v1.0.4
+          © 2024 SoloLvlUp Community. All rights reserved. <br/>
+          Growth Platform v1.0.4
         </p>
       </div>
     </footer>

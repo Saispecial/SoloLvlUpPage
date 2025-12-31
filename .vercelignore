@@ -1,0 +1,9 @@
+node_modules
+.git
+.env
+.local
+server
+script
+.replit
+*.log
+dist/index.cjs
