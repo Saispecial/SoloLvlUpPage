@@ -14,7 +14,7 @@ import { PayPalGate } from "@/components/PayPalGate";
 
 function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
     if (el) {
@@ -26,16 +26,16 @@ function Navbar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 bg-black/80 backdrop-blur-md border-b border-white/10 h-16 md:h-20">
       <div className="max-w-7xl mx-auto px-6 h-full flex items-center justify-between">
-        <img 
-          src="/logo.png" 
-          alt="SoloLvlUp" 
+        <img
+          src="/logo.png"
+          alt="SoloLvlUp"
           className="h-8 md:h-10 w-auto"
         />
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {["Features", "Dashboard", "Contact"].map((item) => (
-            <button 
+            <button
               key={item}
               onClick={() => scrollTo(item.toLowerCase())}
               className="text-sm font-mono uppercase tracking-widest text-gray-400 hover:text-primary transition-colors hover:text-glow"
@@ -43,7 +43,7 @@ function Navbar() {
               {item}
             </button>
           ))}
-          <NeonButton onClick={() => window.open('https://forms.google.com', '_blank')} className="px-6 py-2 text-sm">
+          <NeonButton onClick={() => scrollTo('contact')} className="px-6 py-2 text-sm">
             Join Community
           </NeonButton>
         </div>
@@ -58,7 +58,7 @@ function Navbar() {
       {mobileMenuOpen && (
         <div className="absolute top-16 left-0 right-0 bg-black border-b border-primary/20 p-6 flex flex-col gap-4 md:hidden">
           {["Features", "Dashboard", "Contact"].map((item) => (
-            <button 
+            <button
               key={item}
               onClick={() => scrollTo(item.toLowerCase())}
               className="text-left text-lg font-mono uppercase tracking-widest text-gray-300"
@@ -83,11 +83,11 @@ function HeroSection() {
       <div className="absolute inset-0 z-0">
         {/* Abstract cyber grid */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f2937_1px,transparent_1px),linear-gradient(to_bottom,#1f2937_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20" />
-        
+
         {/* Glow orb */}
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[128px]" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[128px]" />
-        
+
         {/* Dark overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/80 to-background" />
       </div>
@@ -102,12 +102,12 @@ function HeroSection() {
           <div className="inline-block mb-4 px-4 py-1 border border-primary/30 bg-primary/5 rounded-full backdrop-blur-sm">
             <span className="text-primary font-mono text-xs tracking-[0.2em] uppercase">System Notification</span>
           </div>
-          
+
           <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white via-white to-gray-500 mb-6 drop-shadow-2xl">
             AWAKEN<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary text-glow">YOUR POWER</span>
           </h1>
-          
+
           <p className="max-w-2xl mx-auto text-gray-400 text-lg md:text-xl font-mono mb-10 leading-relaxed">
             Track your daily quests, unlock meaningful achievements, and grow through reflection-driven challenges.
             Your personal growth journey starts here.
@@ -126,7 +126,7 @@ function HeroSection() {
       </div>
 
       {/* Scroll Indicator */}
-      <motion.div 
+      <motion.div
         style={{ y: y2 }}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 text-primary/50 flex flex-col items-center gap-2"
         animate={{ y: [0, 10, 0] }}
@@ -159,53 +159,53 @@ function DashboardSection() {
             transition={{ duration: 1, type: "spring" }}
             className="w-full max-w-5xl mx-auto bg-card border border-white/10 rounded-xl overflow-hidden shadow-2xl box-glow"
           >
-             {/* Fake UI Header */}
-             <div className="h-12 bg-black/50 border-b border-white/10 flex items-center px-4 gap-2">
-               <div className="w-3 h-3 rounded-full bg-red-500/50" />
-               <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
-               <div className="w-3 h-3 rounded-full bg-green-500/50" />
-               <div className="ml-auto text-xs font-mono text-gray-500">GROWTH.APP</div>
-             </div>
-             
-             {/* Fake UI Content - using abstract shapes instead of screenshot */}
-             <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6 bg-gradient-to-br from-gray-900 to-black h-[500px]">
-               {/* Sidebar */}
-               <div className="col-span-1 border border-primary/20 bg-primary/5 rounded p-4 flex flex-col gap-4">
-                 <div className="w-20 h-20 bg-gray-800 rounded-full mx-auto border-2 border-primary mb-4" />
-                 <div className="space-y-2">
-                   <div className="h-4 bg-primary/20 rounded w-full" />
-                   <div className="h-4 bg-primary/10 rounded w-3/4" />
-                   <div className="h-4 bg-primary/10 rounded w-1/2" />
-                 </div>
-                 <div className="mt-auto p-4 bg-black/40 rounded border border-white/5">
-                   <div className="text-xs text-primary font-mono mb-2">STATUS: GROWING</div>
-                   <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                     <div className="h-full w-[80%] bg-primary" />
-                   </div>
-                 </div>
-               </div>
-               
-               {/* Main Area */}
-               <div className="col-span-1 md:col-span-2 grid grid-rows-2 gap-6">
-                 <div className="border border-white/10 bg-white/5 rounded p-6 relative overflow-hidden">
-                   <h3 className="text-xl font-display text-white mb-4">Daily Focus: Mindful Movement</h3>
-                   <div className="grid grid-cols-2 gap-4">
-                     <div className="bg-black/40 p-4 rounded">
-                       <div className="text-2xl text-white font-bold">30min</div>
-                       <div className="text-xs text-gray-400">MEDITATION</div>
-                     </div>
-                     <div className="bg-black/40 p-4 rounded">
-                       <div className="text-2xl text-white font-bold">5km</div>
-                       <div className="text-xs text-gray-400">WALK</div>
-                     </div>
-                   </div>
-                 </div>
-                 <div className="grid grid-cols-2 gap-6">
-                    <div className="border border-white/10 bg-white/5 rounded" />
-                    <div className="border border-white/10 bg-white/5 rounded" />
-                 </div>
-               </div>
-             </div>
+            {/* Fake UI Header */}
+            <div className="h-12 bg-black/50 border-b border-white/10 flex items-center px-4 gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500/50" />
+              <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
+              <div className="w-3 h-3 rounded-full bg-green-500/50" />
+              <div className="ml-auto text-xs font-mono text-gray-500">GROWTH.APP</div>
+            </div>
+
+            {/* Fake UI Content - using abstract shapes instead of screenshot */}
+            <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-6 bg-gradient-to-br from-gray-900 to-black h-[500px]">
+              {/* Sidebar */}
+              <div className="col-span-1 border border-primary/20 bg-primary/5 rounded p-4 flex flex-col gap-4">
+                <div className="w-20 h-20 bg-gray-800 rounded-full mx-auto border-2 border-primary mb-4" />
+                <div className="space-y-2">
+                  <div className="h-4 bg-primary/20 rounded w-full" />
+                  <div className="h-4 bg-primary/10 rounded w-3/4" />
+                  <div className="h-4 bg-primary/10 rounded w-1/2" />
+                </div>
+                <div className="mt-auto p-4 bg-black/40 rounded border border-white/5">
+                  <div className="text-xs text-primary font-mono mb-2">STATUS: GROWING</div>
+                  <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                    <div className="h-full w-[80%] bg-primary" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Area */}
+              <div className="col-span-1 md:col-span-2 grid grid-rows-2 gap-6">
+                <div className="border border-white/10 bg-white/5 rounded p-6 relative overflow-hidden">
+                  <h3 className="text-xl font-display text-white mb-4">Daily Focus: Mindful Movement</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-black/40 p-4 rounded">
+                      <div className="text-2xl text-white font-bold">30min</div>
+                      <div className="text-xs text-gray-400">MEDITATION</div>
+                    </div>
+                    <div className="bg-black/40 p-4 rounded">
+                      <div className="text-2xl text-white font-bold">5km</div>
+                      <div className="text-xs text-gray-400">WALK</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="border border-white/10 bg-white/5 rounded" />
+                  <div className="border border-white/10 bg-white/5 rounded" />
+                </div>
+              </div>
+            </div>
           </motion.div>
 
           {/* Floating Elements behind */}
@@ -227,12 +227,12 @@ function FeatureCard({ icon: Icon, title, desc, delay }: { icon: any, title: str
       className="group relative bg-card border border-white/10 p-8 rounded-xl hover:border-primary/50 transition-colors duration-300"
     >
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl" />
-      
+
       <div className="relative z-10">
         <div className="w-12 h-12 bg-black border border-primary/30 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 group-hover:border-primary group-hover:shadow-[0_0_20px_rgba(0,242,255,0.3)] transition-all duration-300">
           <Icon className="text-white group-hover:text-primary transition-colors" size={24} />
         </div>
-        
+
         <h3 className="text-2xl text-white mb-3 group-hover:text-primary transition-colors">{title}</h3>
         <p className="text-gray-400 leading-relaxed font-mono text-sm">{desc}</p>
       </div>
@@ -264,11 +264,11 @@ function FeaturesSection() {
 function ContactSection() {
   const [showPaymentGate, setShowPaymentGate] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
-  
+
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<ContactInput>({
     resolver: zodResolver(api.contact.submit.input)
   });
-  
+
   const { mutateAsync: createContact } = useCreateContact();
   const [alert, setAlert] = useState<{ open: boolean, type: "success" | "error", title: string, message: string }>({
     open: false, type: "success", title: "", message: ""
@@ -312,33 +312,33 @@ function ContactSection() {
         message: error instanceof Error ? error.message : "Unknown error occurred."
       });
     }
-    
+
     setTimeout(() => setAlert(prev => ({ ...prev, open: false })), 5000);
   };
 
   return (
     <section id="contact" className="py-32 relative">
       {showPaymentGate && (
-        <PayPalGate 
+        <PayPalGate
           onPaymentSuccess={handlePaymentSuccess}
           onSkipPayment={handleSkipPayment} // Remove this in production
         />
       )}
-      
-      <SystemAlert 
-        isOpen={alert.open} 
-        type={alert.type} 
-        title={alert.title} 
-        message={alert.message} 
+
+      <SystemAlert
+        isOpen={alert.open}
+        type={alert.type}
+        title={alert.title}
+        message={alert.message}
       />
 
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 bg-card/30 border border-white/5 p-8 md:p-12 rounded-2xl backdrop-blur-sm">
-          
+
           <div>
             <h2 className="text-4xl text-white mb-2">JOIN THE <span className="text-secondary">COMMUNITY</span></h2>
             <p className="text-gray-400 font-mono mb-8">Connect with our growth-focused community.</p>
-            
+
             {!hasAccess ? (
               <div className="space-y-6">
                 <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 rounded-xl p-6">
@@ -350,7 +350,7 @@ function ContactSection() {
                     Join Community - $29/month
                   </NeonButton>
                 </div>
-                
+
                 <div className="text-center">
                   <p className="text-gray-500 text-xs">
                     Secure payment with PayPal • Cancel anytime • 30-day money-back guarantee
@@ -361,7 +361,7 @@ function ContactSection() {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="space-y-2">
                   <label className="text-xs font-mono uppercase text-gray-500">Your Name</label>
-                  <input 
+                  <input
                     {...register("name")}
                     className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono"
                     placeholder="Alex Johnson"
@@ -371,7 +371,7 @@ function ContactSection() {
 
                 <div className="space-y-2">
                   <label className="text-xs font-mono uppercase text-gray-500">Contact Email</label>
-                  <input 
+                  <input
                     {...register("email")}
                     className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono"
                     placeholder="alex@email.com"
@@ -381,7 +381,7 @@ function ContactSection() {
 
                 <div className="space-y-2">
                   <label className="text-xs font-mono uppercase text-gray-500">Your Message</label>
-                  <textarea 
+                  <textarea
                     {...register("message")}
                     rows={4}
                     className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono resize-none"
@@ -404,14 +404,14 @@ function ContactSection() {
                 Prefer a quick start? Use our external form to begin your personal growth journey immediately.
               </p>
             </div>
-            
+
             <div className="bg-gradient-to-br from-secondary/20 to-transparent p-6 rounded-xl border border-secondary/30 box-glow-purple">
               <h4 className="text-secondary font-bold text-lg mb-2">GROWTH COMMUNITY FORM</h4>
               <p className="text-xs text-gray-300 mb-6 font-mono">Form ID: #GC-2024-X</p>
-              
-              <a 
-                href="https://forms.google.com" 
-                target="_blank" 
+
+              <a
+                href="https://forms.google.com"
+                target="_blank"
                 rel="noreferrer"
                 className="flex items-center justify-center gap-2 w-full py-3 bg-secondary text-white font-bold uppercase tracking-widest hover:bg-secondary/80 transition-colors rounded shadow-[0_0_15px_rgba(157,0,255,0.4)]"
               >
@@ -429,13 +429,13 @@ function Footer() {
   return (
     <footer className="py-12 border-t border-white/5 bg-black">
       <div className="container mx-auto px-4 text-center">
-        <img 
-          src="/logo.png" 
-          alt="SoloLvlUp" 
+        <img
+          src="/logo.png"
+          alt="SoloLvlUp"
           className="h-12 w-auto mx-auto mb-4"
         />
         <p className="text-gray-600 font-mono text-sm">
-          © 2024 SoloLvlUp Community. All rights reserved. <br/>
+          © 2024 SoloLvlUp Community. All rights reserved. <br />
           Growth Platform v1.0.4
         </p>
       </div>
