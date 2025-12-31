@@ -78,8 +78,8 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
   }, [paypalLoaded, method, setLocation]);
 
   const handleUPI = () => {
-    // Placeholder Google Form URL for UPI Verification
-    window.open('https://forms.google.com/your-verification-form-id', '_blank');
+    // Official Google Form URL for UPI Verification
+    window.open('https://forms.gle/KxzNaECgf6YVHc9e7', '_blank');
   };
 
   return (
