@@ -410,7 +410,7 @@ function ContactSection() {
               <p className="text-xs text-gray-300 mb-6 font-mono">Form ID: #GC-2024-X</p>
 
               <a
-                href="https://forms.google.com"
+                href="https://forms.gle/KxzNaECgf6YVHc9e7"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center justify-center gap-2 w-full py-3 bg-secondary text-white font-bold uppercase tracking-widest hover:bg-secondary/80 transition-colors rounded shadow-[0_0_15px_rgba(157,0,255,0.4)]"
