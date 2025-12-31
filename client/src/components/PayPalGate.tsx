@@ -25,7 +25,7 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
     if (method === 'paypal' && !window.paypal) {
       const script = document.createElement('script');
       // Note: Removed vault=true and intent=subscription. Added currency=USD.
-      script.src = `https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || 'demo'}&currency=USD&intent=capture`;
+      script.src = `https://www.paypal.com/sdk/js?client-id=${import.meta.env.VITE_PAYPAL_CLIENT_ID || 'demo'}&currency=USD&intent=capture`;
       script.onload = () => setPaypalLoaded(true);
       document.body.appendChild(script);
     } else if (method === 'paypal' && window.paypal) {
@@ -46,7 +46,7 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
           layout: 'vertical',
           label: 'pay'
         },
-        createOrder: function(data: any, actions: any) {
+        createOrder: function (data: any, actions: any) {
           return actions.order.create({
             purchase_units: [{
               description: "SoloLvlUp Community Access",
@@ -56,21 +56,21 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
             }]
           });
         },
-        onApprove: function(data: any, actions: any) {
+        onApprove: function (data: any, actions: any) {
           // CRITICAL: We do NOT verify here. Webhook is the source of truth.
           // Just redirect to success page to guide the user.
           console.log("PayPal approved, redirecting...", data);
-          
+
           // Capture logic happens automatically on backend via webhook or we could capture here if we want immediate confirmation, 
           // but strict instruction says "capture order" then redirect. 
           // Actually, the standard flow is to capture on client OR server. 
           // Plan says: "Capture order" inside onApprove then redirect.
-          return actions.order.capture().then(function(details: any) {
-             console.log('Transaction completed by ' + details.payer.name.given_name);
-             setLocation("/payment-success");
+          return actions.order.capture().then(function (details: any) {
+            console.log('Transaction completed by ' + details.payer.name.given_name);
+            setLocation("/payment-success");
           });
         },
-        onError: function(err: any) {
+        onError: function (err: any) {
           console.error('PayPal error:', err);
         }
       }).render('#paypal-button-container');
@@ -91,12 +91,12 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
       <div className="bg-card border border-white/10 rounded-2xl p-8 max-w-md w-full relative">
         {/* Back Button */}
         {method === 'paypal' && (
-           <button 
-             onClick={() => setMethod('selection')}
-             className="absolute top-4 left-4 text-gray-400 hover:text-white"
-           >
-             ← Back
-           </button>
+          <button
+            onClick={() => setMethod('selection')}
+            className="absolute top-4 left-4 text-gray-400 hover:text-white"
+          >
+            ← Back
+          </button>
         )}
 
         <div className="text-center mb-8">
@@ -111,10 +111,10 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
 
         {/* Features Summary */}
         <div className="space-y-3 mb-8">
-           <div className="flex items-center gap-3">
-              <Star className="text-primary" size={16} />
-              <span className="text-gray-300 text-sm">Lifetime Access</span>
-           </div>
+          <div className="flex items-center gap-3">
+            <Star className="text-primary" size={16} />
+            <span className="text-gray-300 text-sm">Lifetime Access</span>
+          </div>
         </div>
 
         {method === 'selection' ? (
@@ -125,12 +125,12 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
               className="w-full bg-[#0070ba] hover:bg-[#005ea6] text-white p-4 rounded-xl flex items-center justify-between transition-all group"
             >
               <div className="flex flex-col items-start">
-                 <span className="font-bold">Pay with PayPal</span>
-                 <span className="text-xs opacity-90">International Cards Accepted</span>
+                <span className="font-bold">Pay with PayPal</span>
+                <span className="text-xs opacity-90">International Cards Accepted</span>
               </div>
               <div className="flex items-center gap-2">
-                 <span className="font-bold text-lg">$2.00</span>
-                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform"/>
+                <span className="font-bold text-lg">$2.00</span>
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </div>
             </button>
 
@@ -139,34 +139,34 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
               onClick={handleUPI}
               className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:opacity-90 text-white p-4 rounded-xl flex items-center justify-between transition-all group"
             >
-               <div className="flex flex-col items-start">
-                 <span className="font-bold">Pay via UPI (India)</span>
-                 <span className="text-xs opacity-90">Google Pay / PhonePe / Paytm</span>
+              <div className="flex flex-col items-start">
+                <span className="font-bold">Pay via UPI (India)</span>
+                <span className="text-xs opacity-90">Google Pay / PhonePe / Paytm</span>
               </div>
               <div className="flex items-center gap-2">
-                 <span className="font-bold text-lg">₹149</span>
-                 <ExternalLink size={16} />
+                <span className="font-bold text-lg">₹149</span>
+                <ExternalLink size={16} />
               </div>
             </button>
-             
-             <p className="text-xs text-center text-gray-500 mt-4">
-               *UPI requires manual verification via Google Form
-             </p>
+
+            <p className="text-xs text-center text-gray-500 mt-4">
+              *UPI requires manual verification via Google Form
+            </p>
           </div>
         ) : (
           /* PayPal View */
           <div className="w-full">
-             <div className="bg-blue-900/20 border border-blue-500/30 p-4 rounded-lg mb-6 text-center">
-                <p className="text-blue-200 text-sm">Total to pay: <strong>$2.00</strong></p>
-             </div>
-             
-             <div id="paypal-button-container" className="min-h-[150px]">
-                {!paypalLoaded && (
-                   <div className="w-full h-12 bg-gray-800 rounded animate-pulse flex items-center justify-center">
-                    <span className="text-gray-500 text-sm">Connecting to PayPal...</span>
-                  </div>
-                )}
-             </div>
+            <div className="bg-blue-900/20 border border-blue-500/30 p-4 rounded-lg mb-6 text-center">
+              <p className="text-blue-200 text-sm">Total to pay: <strong>$2.00</strong></p>
+            </div>
+
+            <div id="paypal-button-container" className="min-h-[150px]">
+              {!paypalLoaded && (
+                <div className="w-full h-12 bg-gray-800 rounded animate-pulse flex items-center justify-center">
+                  <span className="text-gray-500 text-sm">Connecting to PayPal...</span>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
