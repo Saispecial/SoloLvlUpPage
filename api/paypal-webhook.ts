@@ -1,7 +1,25 @@
-import { db } from '../server/db';
-import { payments } from '../shared/schema';
+import { VercelRequest, VercelResponse } from '@vercel/node';
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import { pgTable, text, serial, timestamp } from "drizzle-orm/pg-core";
 
-// ... (rest of imports)
+// --- INLINE DB SETUP (To avoid Vercel Module Resolution Issues) ---
+neonConfig.fetchConnectionCache = true;
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
+  provider: text("provider").notNull(),
+  providerRef: text("provider_ref").unique(),
+  payerEmail: text("payer_email"),
+  amount: text("amount").notNull(),
+  currency: text("currency"),
+  status: text("status").notNull(),
+  rawEvent: text("raw_event"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+const db = drizzle(pool);
+// ------------------------------------------------------------------
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -10,6 +28,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const body = req.body;
+
+    // Safety check for body
+    if (!body || !body.event_type) {
+      console.error("Missing body or event_type");
+      return res.status(400).json({ error: "Invalid Payload" });
+    }
+
     const eventType = body.event_type;
 
     // 1. TRUST ONLY PAYMENT.CAPTURE.COMPLETED
@@ -27,12 +52,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const verifiedCapture = await getPayPalCapture(captureId);
 
     if (verifiedCapture.status !== 'COMPLETED') {
-      console.error('Capture not completed:', verifiedCapture.status);
+      console.error('Capture not completed. Status:', verifiedCapture.status);
       return res.status(400).json({ error: 'Capture not completed' });
     }
 
     // 3. IDEMPOTENCY & DB UPSERT
-    console.log(`[PAYPAL_WEBHOOK] Processing verified payment: ${captureId} for ${payerEmail}`);
+    console.log(`[PAYPAL_WEBHOOK] Payment verified: ${captureId} for ${payerEmail}. Saving to DB...`);
 
     try {
       await db.insert(payments).values({
@@ -44,10 +69,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         status: 'COMPLETED',
         rawEvent: JSON.stringify(body)
       }).onConflictDoNothing(); // Prevent duplicates
+      console.log("[PAYPAL_WEBHOOK] DB Insert Success!");
     } catch (dbError) {
       console.error('DB Insert Error:', dbError);
-      // We do NOT return error here, because payment is valid. We log it.
-      // We might want to alert admin.
     }
 
     // 4. UNLOCK PREMIUM ACCESS
@@ -79,6 +103,12 @@ async function getPayPalAccessToken(): Promise<string> {
     body: 'grant_type=client_credentials',
   });
 
+  if (!response.ok) {
+    const errText = await response.text();
+    console.error("PayPal Access Token Failed:", response.status, errText);
+    throw new Error("Failed to get PayPal Access Token");
+  }
+
   const data = await response.json();
   return data.access_token;
 }
@@ -98,6 +128,8 @@ async function getPayPalCapture(captureId: string): Promise<any> {
   });
 
   if (!response.ok) {
+    const errText = await response.text();
+    console.error(`PayPal Capture Fetch Failed [${captureId}]:`, response.status, errText);
     throw new Error('Failed to fetch capture details');
   }
 
