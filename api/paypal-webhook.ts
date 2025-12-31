@@ -46,7 +46,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const captureId = resource.id;
     const amountVal = resource.amount?.value;
     const currency = resource.amount?.currency_code;
-    const payerEmail = resource.payer?.email_address || resource.supplementary_data?.payer?.email;
+
+    // Initial attempt to get email from webhook payload
+    let payerEmail = resource.payer?.email_address || resource.supplementary_data?.payer?.email;
 
     // 2. VERIFY with PayPal API (Source of Truth)
     const verifiedCapture = await getPayPalCapture(captureId);
@@ -54,6 +56,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (verifiedCapture.status !== 'COMPLETED') {
       console.error('Capture not completed. Status:', verifiedCapture.status);
       return res.status(400).json({ error: 'Capture not completed' });
+    }
+
+    // Aggressive Email Search: If missing, fetch Order
+    if (!payerEmail) {
+      console.log(`[PAYPAL_WEBHOOK] Email missing in payload for ${captureId}. checking Order...`);
+
+      // Check capture response for payer info directly (rare but possible)
+      if (verifiedCapture.payer?.email_address) {
+        payerEmail = verifiedCapture.payer.email_address;
+      }
+      // Check for Order ID and fetch Order
+      else if (verifiedCapture.supplementary_data?.related_ids?.order_id) {
+        try {
+          const orderId = verifiedCapture.supplementary_data.related_ids.order_id;
+          const order = await getPayPalOrder(orderId);
+          if (order.payer?.email_address) {
+            payerEmail = order.payer.email_address;
+            console.log(`[PAYPAL_WEBHOOK] Found email in Order ${orderId}: ${payerEmail}`);
+          }
+        } catch (err) {
+          console.error("[PAYPAL_WEBHOOK] Failed to fetch Order for email:", err);
+        }
+      }
     }
 
     // 3. IDEMPOTENCY & DB UPSERT
@@ -131,6 +156,29 @@ async function getPayPalCapture(captureId: string): Promise<any> {
     const errText = await response.text();
     console.error(`PayPal Capture Fetch Failed [${captureId}]:`, response.status, errText);
     throw new Error('Failed to fetch capture details');
+  }
+
+  return await response.json();
+}
+
+// Helper to get Order Details
+async function getPayPalOrder(orderId: string): Promise<any> {
+  const accessToken = await getPayPalAccessToken();
+  const base = process.env.PAYPAL_ENVIRONMENT === 'sandbox'
+    ? 'https://api.sandbox.paypal.com'
+    : 'https://api.paypal.com';
+
+  const response = await fetch(`${base}/v2/checkout/orders/${orderId}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    console.error(`PayPal Order Fetch Failed [${orderId}]:`, response.status, errText);
+    throw new Error('Failed to fetch order details');
   }
 
   return await response.json();
