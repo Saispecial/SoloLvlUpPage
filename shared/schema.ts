@@ -22,4 +22,20 @@ export type InsertContact = z.infer<typeof insertContactSchema>;
 export type CreateContactRequest = InsertContact;
 
 // Response types
+// Response types
 export type ContactResponse = Contact;
+
+export const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
+  provider: text("provider").notNull(),
+  providerRef: text("provider_ref").unique(),
+  payerEmail: text("payer_email"),
+  amount: text("amount").notNull(), // numeric often returned as string in JS drivers
+  currency: text("currency"),
+  status: text("status").notNull(),
+  rawEvent: text("raw_event"), // Storing JSON as text/jsonb
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type Payment = typeof payments.$inferSelect;
+export type InsertPayment = typeof payments.$inferInsert;

@@ -1,4 +1,7 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import { db } from '../server/db';
+import { payments } from '../shared/schema';
+
+// ... (rest of imports)
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -11,7 +14,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // 1. TRUST ONLY PAYMENT.CAPTURE.COMPLETED
     if (eventType !== 'PAYMENT.CAPTURE.COMPLETED') {
-      // Return 200 to PayPal so they don't retry, but ignore logic
       return res.status(200).json({ status: 'ignored', type: eventType });
     }
 
@@ -22,8 +24,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const payerEmail = resource.payer?.email_address || resource.supplementary_data?.payer?.email;
 
     // 2. VERIFY with PayPal API (Source of Truth)
-    // Even though the webhook payload has data, we fetch it to ensure authenticity 
-    // and avoid spoofed webhooks if signature validation isn't strict (which is hard to do in serverless without raw body).
     const verifiedCapture = await getPayPalCapture(captureId);
 
     if (verifiedCapture.status !== 'COMPLETED') {
@@ -32,19 +32,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 3. IDEMPOTENCY & DB UPSERT
-    // TODO: Connect this to your real database using the schema:
-    // CREATE TABLE payments (..., provider_ref VARCHAR(255) UNIQUE, ...);
-
     console.log(`[PAYPAL_WEBHOOK] Processing verified payment: ${captureId} for ${payerEmail}`);
 
-    // PSEUDO-CODE for Database Upsert:
-    /*
-    await db.query(`
-      INSERT INTO payments (provider, provider_ref, payer_email, amount, currency, status, raw_event)
-      VALUES ('paypal', $1, $2, $3, $4, 'COMPLETED', $5)
-      ON CONFLICT (provider_ref) DO NOTHING
-    `, [captureId, payerEmail, amountVal, currency, JSON.stringify(body)]);
-    */
+    try {
+      await db.insert(payments).values({
+        provider: 'paypal',
+        providerRef: captureId,
+        payerEmail: payerEmail,
+        amount: amountVal,
+        currency: currency,
+        status: 'COMPLETED',
+        rawEvent: JSON.stringify(body)
+      }).onConflictDoNothing(); // Prevent duplicates
+    } catch (dbError) {
+      console.error('DB Insert Error:', dbError);
+      // We do NOT return error here, because payment is valid. We log it.
+      // We might want to alert admin.
+    }
 
     // 4. UNLOCK PREMIUM ACCESS
     // await unlockAccess(payerEmail);
