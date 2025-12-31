@@ -8,6 +8,7 @@ import { useCreateContact } from "@/hooks/use-contact";
 import { NeonButton } from "@/components/NeonButton";
 import { ParallaxCharacter } from "@/components/ParallaxCharacter";
 import { SystemAlert } from "@/components/SystemAlert";
+import { PayPalGate } from "@/components/PayPalGate";
 
 // --- Components for sections ---
 
@@ -261,6 +262,9 @@ function FeaturesSection() {
 }
 
 function ContactSection() {
+  const [showPaymentGate, setShowPaymentGate] = useState(false);
+  const [hasAccess, setHasAccess] = useState(false);
+  
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<ContactInput>({
     resolver: zodResolver(api.contact.submit.input)
   });
@@ -269,6 +273,26 @@ function ContactSection() {
   const [alert, setAlert] = useState<{ open: boolean, type: "success" | "error", title: string, message: string }>({
     open: false, type: "success", title: "", message: ""
   });
+
+  const handleJoinCommunity = () => {
+    setShowPaymentGate(true);
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentGate(false);
+    setHasAccess(true);
+    setAlert({
+      open: true,
+      type: "success",
+      title: "Welcome to the Community!",
+      message: "Payment successful! You now have access to our exclusive community."
+    });
+  };
+
+  const handleSkipPayment = () => {
+    setShowPaymentGate(false);
+    setHasAccess(true);
+  };
 
   const onSubmit = async (data: ContactInput) => {
     try {
@@ -294,6 +318,13 @@ function ContactSection() {
 
   return (
     <section id="contact" className="py-32 relative">
+      {showPaymentGate && (
+        <PayPalGate 
+          onPaymentSuccess={handlePaymentSuccess}
+          onSkipPayment={handleSkipPayment} // Remove this in production
+        />
+      )}
+      
       <SystemAlert 
         isOpen={alert.open} 
         type={alert.type} 
@@ -308,42 +339,62 @@ function ContactSection() {
             <h2 className="text-4xl text-white mb-2">JOIN THE <span className="text-secondary">COMMUNITY</span></h2>
             <p className="text-gray-400 font-mono mb-8">Connect with our growth-focused community.</p>
             
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="space-y-2">
-                <label className="text-xs font-mono uppercase text-gray-500">Your Name</label>
-                <input 
-                  {...register("name")}
-                  className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono"
-                  placeholder="Alex Johnson"
-                />
-                {errors.name && <span className="text-destructive text-xs">{errors.name.message}</span>}
+            {!hasAccess ? (
+              <div className="space-y-6">
+                <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-primary/20 rounded-xl p-6">
+                  <h3 className="text-xl text-white mb-3">Premium Access Required</h3>
+                  <p className="text-gray-300 text-sm mb-4">
+                    Join our exclusive community to unlock personalized growth tracking, AI-powered challenges, and direct mentor access.
+                  </p>
+                  <NeonButton onClick={handleJoinCommunity} className="w-full">
+                    Join Community - $29/month
+                  </NeonButton>
+                </div>
+                
+                <div className="text-center">
+                  <p className="text-gray-500 text-xs">
+                    Secure payment with PayPal • Cancel anytime • 30-day money-back guarantee
+                  </p>
+                </div>
               </div>
+            ) : (
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-mono uppercase text-gray-500">Your Name</label>
+                  <input 
+                    {...register("name")}
+                    className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono"
+                    placeholder="Alex Johnson"
+                  />
+                  {errors.name && <span className="text-destructive text-xs">{errors.name.message}</span>}
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-mono uppercase text-gray-500">Contact Email</label>
-                <input 
-                  {...register("email")}
-                  className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono"
-                  placeholder="alex@email.com"
-                />
-                {errors.email && <span className="text-destructive text-xs">{errors.email.message}</span>}
-              </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-mono uppercase text-gray-500">Contact Email</label>
+                  <input 
+                    {...register("email")}
+                    className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono"
+                    placeholder="alex@email.com"
+                  />
+                  {errors.email && <span className="text-destructive text-xs">{errors.email.message}</span>}
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-mono uppercase text-gray-500">Your Message</label>
-                <textarea 
-                  {...register("message")}
-                  rows={4}
-                  className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono resize-none"
-                  placeholder="I'm interested in starting my growth journey..."
-                />
-                {errors.message && <span className="text-destructive text-xs">{errors.message.message}</span>}
-              </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-mono uppercase text-gray-500">Your Message</label>
+                  <textarea 
+                    {...register("message")}
+                    rows={4}
+                    className="w-full bg-black/50 border border-white/10 rounded p-3 text-white focus:border-primary focus:outline-none focus:shadow-[0_0_15px_rgba(0,242,255,0.2)] transition-all font-mono resize-none"
+                    placeholder="I'm interested in starting my growth journey..."
+                  />
+                  {errors.message && <span className="text-destructive text-xs">{errors.message.message}</span>}
+                </div>
 
-              <NeonButton type="submit" isLoading={isSubmitting} className="w-full">
-                Send Message <Send size={16} />
-              </NeonButton>
-            </form>
+                <NeonButton type="submit" isLoading={isSubmitting} className="w-full">
+                  Send Message <Send size={16} />
+                </NeonButton>
+              </form>
+            )}
           </div>
 
           <div className="flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-white/10 pt-8 lg:pt-0 lg:pl-12">
