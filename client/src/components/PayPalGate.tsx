@@ -6,7 +6,6 @@ import { useLocation } from "wouter";
 
 interface PayPalGateProps {
   onPaymentSuccess?: () => void; // Deprecated in favor of redirect, but kept for interface compatibility
-  onSkipPayment?: () => void; // For testing/demo purposes
 }
 
 declare global {
@@ -15,7 +14,7 @@ declare global {
   }
 }
 
-export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
+export function PayPalGate({ }: PayPalGateProps) {
   const [, setLocation] = useLocation();
   const [method, setMethod] = useState<'selection' | 'paypal'>('selection');
   const [paypalLoaded, setPaypalLoaded] = useState(false);
@@ -32,6 +31,16 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
       setPaypalLoaded(true);
     }
   }, [method]);
+
+  // Ensure we have a session ID for tracking independent of PayPal login
+  useEffect(() => {
+    if (!localStorage.getItem('payment_session_id')) {
+      const sid = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : Math.random().toString(36).substring(2) + Date.now().toString(36);
+      localStorage.setItem('payment_session_id', sid);
+    }
+  }, []);
 
   useEffect(() => {
     if (method === 'paypal' && paypalLoaded && window.paypal) {
@@ -50,6 +59,7 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
           return actions.order.create({
             purchase_units: [{
               description: "SoloLvlUp Community Access",
+              custom_id: localStorage.getItem('payment_session_id'), // Link user session
               amount: {
                 value: "2.00"
               }
@@ -81,6 +91,9 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
     // Official Google Form URL for UPI Verification
     window.open('https://forms.gle/KxzNaECgf6YVHc9e7', '_blank');
   };
+
+  // Demo Mode - Removed in Live
+  // if (onSkipPayment) { ... }
 
   return (
     <motion.div
@@ -119,14 +132,14 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
 
         {method === 'selection' ? (
           <div className="space-y-4">
-            {/* Option A: PayPal */}
+            {/* Option A: International */}
             <button
               onClick={() => setMethod('paypal')}
               className="w-full bg-[#0070ba] hover:bg-[#005ea6] text-white p-4 rounded-xl flex items-center justify-between transition-all group"
             >
               <div className="flex flex-col items-start">
-                <span className="font-bold">Pay with PayPal</span>
-                <span className="text-xs opacity-90">International Cards Accepted</span>
+                <span className="font-bold">International</span>
+                <span className="text-xs opacity-90">PayPal / Cards</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-lg">$2.00</span>
@@ -134,14 +147,14 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
               </div>
             </button>
 
-            {/* Option B: UPI */}
+            {/* Option B: India */}
             <button
               onClick={handleUPI}
               className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:opacity-90 text-white p-4 rounded-xl flex items-center justify-between transition-all group"
             >
               <div className="flex flex-col items-start">
-                <span className="font-bold">Pay via UPI (India)</span>
-                <span className="text-xs opacity-90">Google Pay / PhonePe / Paytm</span>
+                <span className="font-bold">India</span>
+                <span className="text-xs opacity-90">UPI / GPay / PhonePe</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-lg">₹149</span>
@@ -150,12 +163,20 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
             </button>
 
             <p className="text-xs text-center text-gray-500 mt-4">
-              *UPI requires manual verification via Google Form
+              *India option requires manual verification via Google Form
             </p>
           </div>
         ) : (
-          /* PayPal View */
-          <div className="w-full">
+          /* "Coming Soon" View for International */
+          <div className="w-full text-center py-8">
+            <div className="bg-white/5 border border-white/10 p-6 rounded-xl animate-pulse">
+              <h3 className="text-xl font-bold text-white mb-2">Coming Soon...</h3>
+              <p className="text-gray-400 text-sm">
+                International payments are currently being integrated. Please check back later or use the India option if you have a supported payment method.
+              </p>
+            </div>
+
+            {/* 
             <div className="bg-blue-900/20 border border-blue-500/30 p-4 rounded-lg mb-6 text-center">
               <p className="text-blue-200 text-sm">Total to pay: <strong>$2.00</strong></p>
             </div>
@@ -167,6 +188,7 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
                 </div>
               )}
             </div>
+            */}
           </div>
         )}
 
@@ -175,16 +197,6 @@ export function PayPalGate({ onSkipPayment }: PayPalGateProps) {
           <Shield size={14} />
           <span>Secure Checkout • Lifetime Access</span>
         </div>
-
-        {/* Demo Mode */}
-        {onSkipPayment && (
-          <button
-            onClick={onSkipPayment}
-            className="w-full text-center mt-4 text-gray-600 text-[10px] hover:text-gray-400"
-          >
-            [DEV] Skip Payment
-          </button>
-        )}
       </div>
     </motion.div>
   );

@@ -15,6 +15,7 @@ const payments = pgTable("payments", {
   amount: text("amount").notNull(),
   currency: text("currency"),
   status: text("status").notNull(),
+  customId: text("custom_id"),
   rawEvent: text("raw_event"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -46,6 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const captureId = resource.id;
     const amountVal = resource.amount?.value;
     const currency = resource.amount?.currency_code;
+    const customId = resource.custom_id; // Extract custom_id
 
     // Initial attempt to get email from webhook payload
     let payerEmail = resource.payer?.email_address || resource.supplementary_data?.payer?.email;
@@ -82,7 +84,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 3. IDEMPOTENCY & DB UPSERT
-    console.log(`[PAYPAL_WEBHOOK] Payment verified: ${captureId} for ${payerEmail}. Saving to DB...`);
+    console.log(`[PAYPAL_WEBHOOK] Payment verified: ${captureId} (CustomID: ${customId}). Saving to DB...`);
 
     try {
       await db.insert(payments).values({
@@ -92,6 +94,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         amount: amountVal,
         currency: currency,
         status: 'COMPLETED',
+        customId: customId,
         rawEvent: JSON.stringify(body)
       }).onConflictDoNothing(); // Prevent duplicates
       console.log("[PAYPAL_WEBHOOK] DB Insert Success!");

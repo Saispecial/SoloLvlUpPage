@@ -321,7 +321,6 @@ function ContactSection() {
       {showPaymentGate && (
         <PayPalGate
           onPaymentSuccess={handlePaymentSuccess}
-          onSkipPayment={handleSkipPayment} // Remove this in production
         />
       )}
 
@@ -347,7 +346,7 @@ function ContactSection() {
                     Join our exclusive community to unlock personalized growth tracking, AI-powered challenges, and direct mentor access.
                   </p>
                   <NeonButton onClick={handleJoinCommunity} className="w-full">
-                    Join Community - $29/month
+                    Join Community - Starting With 2$
                   </NeonButton>
                 </div>
 

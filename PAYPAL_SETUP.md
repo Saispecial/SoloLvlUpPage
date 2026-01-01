@@ -32,7 +32,7 @@ Add these to your `.env` (and Vercel):
 PAYPAL_CLIENT_ID=your_client_id
 PAYPAL_CLIENT_SECRET=your_client_secret
 PAYPAL_ENVIRONMENT=sandbox  # Change to 'live' in production
-NEXT_PUBLIC_PAYPAL_CLIENT_ID=your_client_id
+VITE_PAYPAL_CLIENT_ID=your_client_id
 ```
 
 ### Webhook Configuration

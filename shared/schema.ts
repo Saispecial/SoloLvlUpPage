@@ -33,6 +33,7 @@ export const payments = pgTable("payments", {
   amount: text("amount").notNull(), // numeric often returned as string in JS drivers
   currency: text("currency"),
   status: text("status").notNull(),
+  customId: text("custom_id"), // Link user session to payment
   rawEvent: text("raw_event"), // Storing JSON as text/jsonb
   createdAt: timestamp("created_at").defaultNow(),
 });
