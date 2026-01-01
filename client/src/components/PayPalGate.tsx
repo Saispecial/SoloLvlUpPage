@@ -14,9 +14,9 @@ declare global {
   }
 }
 
-export function PayPalGate({ }: PayPalGateProps) {
+export function PayPalGate({ onPaymentSuccess }: PayPalGateProps) {
   const [, setLocation] = useLocation();
-  const [method, setMethod] = useState<'selection' | 'paypal'>('selection');
+  const [method, setMethod] = useState<'selection' | 'paypal' | 'upi_wait'>('selection');
   const [paypalLoaded, setPaypalLoaded] = useState(false);
 
   // Load PayPal SDK only when needed
@@ -90,6 +90,7 @@ export function PayPalGate({ }: PayPalGateProps) {
   const handleUPI = () => {
     // Official Google Form URL for UPI Verification
     window.open('https://forms.gle/KxzNaECgf6YVHc9e7', '_blank');
+    setMethod('upi_wait');
   };
 
   // Demo Mode - Removed in Live
@@ -103,7 +104,7 @@ export function PayPalGate({ }: PayPalGateProps) {
     >
       <div className="bg-card border border-white/10 rounded-2xl p-8 max-w-md w-full relative">
         {/* Back Button */}
-        {method === 'paypal' && (
+        {(method === 'paypal' || method === 'upi_wait') && (
           <button
             onClick={() => setMethod('selection')}
             className="absolute top-4 left-4 text-gray-400 hover:text-white"
@@ -130,7 +131,7 @@ export function PayPalGate({ }: PayPalGateProps) {
           </div>
         </div>
 
-        {method === 'selection' ? (
+        {method === 'selection' && (
           <div className="space-y-4">
             {/* Option A: International */}
             <button
@@ -166,7 +167,9 @@ export function PayPalGate({ }: PayPalGateProps) {
               *India option requires manual verification via Google Form
             </p>
           </div>
-        ) : (
+        )}
+
+        {method === 'paypal' && (
           /* "Coming Soon" View for International */
           <div className="w-full text-center py-8">
             <div className="bg-white/5 border border-white/10 p-6 rounded-xl animate-pulse">
@@ -175,20 +178,34 @@ export function PayPalGate({ }: PayPalGateProps) {
                 International payments are currently being integrated. Please check back later or use the India option if you have a supported payment method.
               </p>
             </div>
+            {/* PayPal Container would go here if enabled */}
+          </div>
+        )}
 
-            {/* 
-            <div className="bg-blue-900/20 border border-blue-500/30 p-4 rounded-lg mb-6 text-center">
-              <p className="text-blue-200 text-sm">Total to pay: <strong>$2.00</strong></p>
-            </div>
+        {method === 'upi_wait' && (
+          <div className="w-full text-center py-6 space-y-6">
+            <div className="bg-gradient-to-br from-orange-500/10 to-yellow-500/10 border border-orange-500/20 p-6 rounded-xl">
+              <h3 className="text-lg font-bold text-white mb-2">Did you submit the form?</h3>
+              <p className="text-gray-400 text-sm mb-6">
+                We need to verify your payment details from the Google Form to activate your account.
+              </p>
 
-            <div id="paypal-button-container" className="min-h-[150px]">
-              {!paypalLoaded && (
-                <div className="w-full h-12 bg-gray-800 rounded animate-pulse flex items-center justify-center">
-                  <span className="text-gray-500 text-sm">Connecting to PayPal...</span>
-                </div>
-              )}
+              <div className="flex flex-col gap-3">
+                <NeonButton
+                  onClick={() => onPaymentSuccess?.()}
+                  className="w-full justify-center"
+                >
+                  Yes, Form Submitted
+                </NeonButton>
+
+                <button
+                  onClick={() => setMethod('selection')}
+                  className="w-full py-3 text-sm text-gray-500 hover:text-white transition-colors"
+                >
+                  No, I haven't submitted yet
+                </button>
+              </div>
             </div>
-            */}
           </div>
         )}
 
