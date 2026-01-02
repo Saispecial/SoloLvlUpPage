@@ -1,7 +1,8 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { Pool, neonConfig } from "@neondatabase/serverless";
-import { pgTable, text, serial, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean } from "drizzle-orm/pg-core";
+import { eq } from "drizzle-orm";
 
 // --- INLINE DB SETUP (To avoid Vercel Module Resolution Issues) ---
 neonConfig.fetchConnectionCache = true;
@@ -17,6 +18,13 @@ const payments = pgTable("payments", {
   status: text("status").notNull(),
   customId: text("custom_id"),
   rawEvent: text("raw_event"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+const leads = pgTable("leads", {
+  sessionId: text("session_id").primaryKey(),
+  email: text("email").notNull(),
+  paid: boolean("paid").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 const db = drizzle(pool);
@@ -103,7 +111,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 4. UNLOCK PREMIUM ACCESS
-    // await unlockAccess(payerEmail);
+    if (customId) {
+      console.log(`[PAYPAL_WEBHOOK] Linking payment to Lead (Session: ${customId})`);
+      await db.update(leads)
+        .set({ paid: true })
+        .where(eq(leads.sessionId, customId));
+    }
+
     console.log(`[PAYPAL_WEBHOOK] Access unlocked for ${payerEmail}`);
 
     res.status(200).json({ success: true });

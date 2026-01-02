@@ -2,6 +2,7 @@ import type { Express } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
+import { insertLeadSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(
@@ -22,6 +23,20 @@ export async function registerRoutes(
         });
       }
       throw err;
+    }
+  });
+
+  app.post("/api/create-lead", async (req, res) => {
+    try {
+      const input = insertLeadSchema.parse(req.body);
+      const lead = await storage.createLead(input);
+      res.json({ ok: true });
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        return res.status(400).json({ error: err.errors });
+      }
+      console.error("Create Lead Error:", err);
+      res.status(500).json({ error: "Failed to create lead" });
     }
   });
 

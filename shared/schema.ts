@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -40,3 +40,15 @@ export const payments = pgTable("payments", {
 
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = typeof payments.$inferInsert;
+
+export const leads = pgTable("leads", {
+  sessionId: text("session_id").primaryKey(),
+  email: text("email").notNull(),
+  paid: boolean("paid").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export type Lead = typeof leads.$inferSelect;
+export type InsertLead = typeof leads.$inferInsert;
+
+export const insertLeadSchema = createInsertSchema(leads).omit({ paid: true, createdAt: true });

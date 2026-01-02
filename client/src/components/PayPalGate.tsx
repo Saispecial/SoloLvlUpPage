@@ -18,6 +18,9 @@ export function PayPalGate({ onPaymentSuccess }: PayPalGateProps) {
   const [, setLocation] = useLocation();
   const [method, setMethod] = useState<'selection' | 'paypal' | 'upi_wait'>('selection');
   const [paypalLoaded, setPaypalLoaded] = useState(false);
+  const [email, setEmail] = useState('');
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load PayPal SDK only when needed
   useEffect(() => {
@@ -43,7 +46,7 @@ export function PayPalGate({ onPaymentSuccess }: PayPalGateProps) {
   }, []);
 
   useEffect(() => {
-    if (method === 'paypal' && paypalLoaded && window.paypal) {
+    if (method === 'paypal' && paypalLoaded && window.paypal && emailSubmitted) {
       // Clear previous button if any
       const container = document.getElementById('paypal-button-container');
       if (container) container.innerHTML = '';
@@ -85,7 +88,37 @@ export function PayPalGate({ onPaymentSuccess }: PayPalGateProps) {
         }
       }).render('#paypal-button-container');
     }
-  }, [paypalLoaded, method, setLocation]);
+  }, [paypalLoaded, method, setLocation, emailSubmitted]);
+
+  const handleEmailSubmit = async () => {
+    if (!email) return;
+    setIsSubmitting(true);
+
+    try {
+      const sessionId = localStorage.getItem('payment_session_id');
+      const res = await fetch('/api/create-lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sessionId,
+          email
+        })
+      });
+
+      if (res.ok) {
+        setEmailSubmitted(true);
+      } else {
+        console.error("Failed to save lead");
+        // Optional: show error to user
+      }
+    } catch (err) {
+      console.error("Error saving lead:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleUPI = () => {
     // Official Google Form URL for UPI Verification
@@ -169,16 +202,45 @@ export function PayPalGate({ onPaymentSuccess }: PayPalGateProps) {
           </div>
         )}
 
-        {method === 'paypal' && (
-          /* "Coming Soon" View for International */
-          <div className="w-full text-center py-8">
-            <div className="bg-white/5 border border-white/10 p-6 rounded-xl animate-pulse">
-              <h3 className="text-xl font-bold text-white mb-2">Coming Soon...</h3>
+        {method === 'paypal' && !emailSubmitted && (
+          <div className="space-y-4">
+            <div className="text-center mb-6">
+              <h3 className="text-lg font-bold text-white">One Last Step</h3>
               <p className="text-gray-400 text-sm">
-                International payments are currently being integrated. Please check back later or use the India option if you have a supported payment method.
+                This email will be your login for the community.
               </p>
             </div>
-            {/* PayPal Container would go here if enabled */}
+
+            <div className="space-y-2">
+              <label className="text-xs text-gray-500 font-medium ml-1">YOUR BEST EMAIL</label>
+              <input
+                type="email"
+                placeholder="name@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-black/50 border border-white/10 rounded-xl p-4 text-white placeholder-gray-600 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                required
+              />
+            </div>
+
+            <NeonButton
+              onClick={handleEmailSubmit}
+              disabled={!email || isSubmitting}
+              className="w-full justify-center"
+            >
+              {isSubmitting ? 'Saving...' : 'Continue to Payment'}
+            </NeonButton>
+          </div>
+        )}
+
+        {method === 'paypal' && emailSubmitted && (
+          <div className="w-full">
+            <div className="text-center mb-6">
+              <p className="text-sm text-gray-400">
+                Logged in as <span className="text-white font-medium">{email}</span>
+              </p>
+            </div>
+            <div id="paypal-button-container" className="min-h-[150px]"></div>
           </div>
         )}
 
